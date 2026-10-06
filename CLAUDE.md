@@ -51,5 +51,6 @@ o que foi feito, o que falta e decisões pendentes.
 - [x] E1 iniciada (ver checklist em `docs/SPEC.md`)
 - [x] Passo 1: esqueleto (go.mod, layout, Makefile, CLI com 4 subcomandos; `describe` funcionando)
 - [x] Passo 2: `internal/record` (encode/decode + CRC32-C, ADR-002)
-- [ ] Próximo: passo 3 (`internal/storage`)
+- [x] Passo 3: `internal/storage` (Init atômico, Open com recuperação, Put/Get/Delete/Close com SyncAlways; `engine init` ligado; ADR-003)
+- [ ] Próximo: passo 4 (testes de storage: reabrir, truncamento exaustivo, lixo no fim)
 - Obs.: `go test -race` não roda nesta máquina (MinGW 32-bit no PATH; o race exige gcc 64-bit)

@@ -49,3 +49,39 @@ corrompido virar um `make([]byte, 4 GiB)`.
 **Consequências.** Valores acima de 64 MiB são recusados no PUT. Se o professor
 divulgar um limite diferente, basta trocar a constante. Os testes cobrem a troca
 de 1 bit em qualquer posição, todos os prefixos truncados e um fuzz de `Decode`.
+
+---
+
+## ADR-003 — Engine da E1: escrita, falhas de E/S e `init`
+
+**Contexto.** SPEC §4.2, §6 e §7. Passo 3 do checklist, com `--sync always`.
+
+**Decisão.**
+- A escrita usa `WriteAt(e.end)` e, em `SyncAlways`, `fsync` antes de
+  retornar. O índice e `e.end` só avançam **depois** que a escrita (e o
+  fsync) deram certo.
+- **Erro de E/S é pegajoso.** Depois de uma falha de `write` ou `fsync`, o
+  engine recusa todas as escritas seguintes. Após um fsync falho, o kernel pode
+  ter descartado as páginas sujas ("fsyncgate"), e tentar de novo poderia
+  confirmar uma operação que não está no disco. A recuperação correta é
+  reabrir, e o `Open` então refaz o índice a partir do que está de fato no
+  arquivo.
+- Um valor maior que `MaxValueSize` **não** é falha de E/S: o `Put` devolve
+  `ErrValueTooLarge` sem escrever nada, e o engine continua utilizável.
+- `Get` lê com `ReadAt` sob `RLock`, então leituras concorrentes não se bloqueiam.
+- `Close` faz `fsync`, exceto em `SyncNone`.
+- `init` sobre um `data.log` existente apenas valida o cabeçalho. Se o
+  cabeçalho for inválido, `init` falha (exit 1) e não recria nada, o mesmo
+  comportamento do `Open`.
+- O fsync do diretório no `init` é no-op no Windows (`syncdir_windows.go`):
+  lá não dá para fazer `FlushFileBuffers` num diretório aberto com `os.Open`.
+  No Linux (Docker, ambiente da entrega) ele é feito.
+
+**Alternativas.** Usar `O_APPEND`, o que impediria reescrever sobre um
+`write` parcial. Tentar de novo após um fsync falho, o que é incorreto pelo
+motivo acima.
+
+**Consequências.** Uma falha de disco derruba as escritas até reabrir, mas
+nunca produz uma confirmação falsa. Não há lock entre processos: dois
+`engine run` no mesmo diretório corromperiam o log. Isso fica fora do escopo
+da E1.

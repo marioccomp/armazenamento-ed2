@@ -15,6 +15,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+
+	"github.com/ed2-ufrrj/ed2-engine/internal/storage"
 )
 
 const usage = `uso:
@@ -81,7 +83,7 @@ func cmdInit(args []string, stderr io.Writer) error {
 	if *dataDir == "" {
 		return errors.New("--data-dir é obrigatório")
 	}
-	return errNotImplemented
+	return storage.Init(*dataDir)
 }
 
 func cmdRun(args []string, stderr io.Writer) error {

@@ -3,9 +3,13 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/ed2-ufrrj/ed2-engine/internal/storage"
 )
 
 func TestDescribe(t *testing.T) {
@@ -41,7 +45,6 @@ func TestExitCodes(t *testing.T) {
 		{"subcomando desconhecido", []string{"foo"}, 2},
 		{"help", []string{"help"}, 0},
 		{"init sem data-dir", []string{"init"}, 1},
-		{"init não implementado", []string{"init", "--data-dir", "x"}, 1},
 		{"run sem flags", []string{"run"}, 1},
 		{"run sync inválido", []string{"run", "--data-dir", "d", "--input", "i", "--output", "o", "--sync", "xyz"}, 1},
 		{"run batch-size inválido", []string{"run", "--data-dir", "d", "--input", "i", "--output", "o", "--batch-size", "0"}, 1},
@@ -58,6 +61,31 @@ func TestExitCodes(t *testing.T) {
 				t.Errorf("erros não devem ir para stdout: %q", stdout.String())
 			}
 		})
+	}
+}
+
+func TestInit(t *testing.T) {
+	dir := filepath.Join(t.TempDir(), "dados")
+	for i := 0; i < 2; i++ { // a segunda chamada testa a idempotência
+		var stdout, stderr bytes.Buffer
+		if code := run([]string{"init", "--data-dir", dir}, &stdout, &stderr); code != 0 {
+			t.Fatalf("init #%d: exit code = %d, stderr = %q", i+1, code, stderr.String())
+		}
+		if stdout.Len() != 0 {
+			t.Errorf("init não deve escrever em stdout: %q", stdout.String())
+		}
+	}
+	if _, err := os.Stat(filepath.Join(dir, storage.LogFileName)); err != nil {
+		t.Fatal(err)
+	}
+
+	// cabeçalho inválido: erro, sem recriar
+	if err := os.WriteFile(filepath.Join(dir, storage.LogFileName), []byte("lixo"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	var stdout, stderr bytes.Buffer
+	if code := run([]string{"init", "--data-dir", dir}, &stdout, &stderr); code != 1 {
+		t.Fatalf("init sobre cabeçalho inválido: exit code = %d, esperado 1", code)
 	}
 }
 
