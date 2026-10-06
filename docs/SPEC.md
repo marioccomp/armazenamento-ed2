@@ -311,7 +311,7 @@ Quando sair alguma dessas, atualize esta seção e o código correspondente.
 Cada item = um commit, com testes passando.
 
 1. [x] Esqueleto: `go.mod`, layout de pastas, `Makefile`, `cmd/engine` com os 4 subcomandos vazios, `describe` funcionando.
-2. [ ] `internal/record`: encode/decode + CRC32-C + testes de ida e volta e de bit flip.
+2. [x] `internal/record`: encode/decode + CRC32-C + testes de ida e volta e de bit flip.
 3. [ ] `internal/storage`: `init` atômico, cabeçalho do arquivo, `Open` com recuperação, `Put`/`Get`/`Delete`/`Close` com `--sync always`.
 4. [ ] Testes de storage: reabrir, truncamento exaustivo por offset, lixo no fim.
 5. [ ] `internal/oracle` + teste diferencial com reaberturas aleatórias.
