@@ -52,5 +52,6 @@ o que foi feito, o que falta e decisões pendentes.
 - [x] Passo 1: esqueleto (go.mod, layout, Makefile, CLI com 4 subcomandos; `describe` funcionando)
 - [x] Passo 2: `internal/record` (encode/decode + CRC32-C, ADR-002)
 - [x] Passo 3: `internal/storage` (Init atômico, Open com recuperação, Put/Get/Delete/Close com SyncAlways; `engine init` ligado; ADR-003)
-- [ ] Próximo: passo 4 (testes de storage: reabrir, truncamento exaustivo, lixo no fim)
+- [x] Passo 4: testes de recuperação (truncamento em todo offset, lixo no fim, corrupção no meio, reaberturas)
+- [ ] Próximo: passo 5 (`internal/oracle` + teste diferencial)
 - Obs.: `go test -race` não roda nesta máquina (MinGW 32-bit no PATH; o race exige gcc 64-bit)

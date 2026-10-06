@@ -313,7 +313,7 @@ Cada item = um commit, com testes passando.
 1. [x] Esqueleto: `go.mod`, layout de pastas, `Makefile`, `cmd/engine` com os 4 subcomandos vazios, `describe` funcionando.
 2. [x] `internal/record`: encode/decode + CRC32-C + testes de ida e volta e de bit flip.
 3. [x] `internal/storage`: `init` atômico, cabeçalho do arquivo, `Open` com recuperação, `Put`/`Get`/`Delete`/`Close` com `--sync always`.
-4. [ ] Testes de storage: reabrir, truncamento exaustivo por offset, lixo no fim.
+4. [x] Testes de storage: reabrir, truncamento exaustivo por offset, lixo no fim.
 5. [ ] `internal/oracle` + teste diferencial com reaberturas aleatórias.
 6. [ ] `internal/protocol` + `engine run` completo; teste de ida e volta com strings Unicode/escapes e valores grandes.
 7. [ ] Group commit (`--sync batch`, `--batch-size`) respeitando a invariante do §6, com o GET enxergando o buffer.
