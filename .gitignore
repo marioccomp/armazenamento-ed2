@@ -1,0 +1,7 @@
+# binários
+/bin/
+*.exe
+
+# diretórios de dados de testes manuais
+/data/
+/tmp/
